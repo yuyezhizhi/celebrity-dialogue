@@ -647,6 +647,83 @@ header .subtitle {
     opacity: 1;
 }
 
+/* Summary card */
+.summary-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    background: linear-gradient(135deg, rgba(26, 28, 35, 0.95), rgba(20, 22, 28, 0.95));
+    border: 1px solid rgba(201, 169, 110, 0.3);
+    border-radius: 12px;
+    animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.summary-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(201, 169, 110, 0.15);
+}
+
+.summary-icon {
+    font-size: 1.5rem;
+}
+
+.summary-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #c9a96e;
+    letter-spacing: 0.05em;
+}
+
+.summary-content {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: #c8c8d0;
+}
+
+.summary-content p {
+    margin-bottom: 0.8rem;
+}
+
+.summary-content strong {
+    color: #c9a96e;
+    font-weight: 600;
+}
+
+.summary-content h3 {
+    font-size: 1.1rem;
+    color: #c9a96e;
+    margin: 1.2rem 0 0.5rem 0;
+    font-weight: 600;
+}
+
+.summary-content h4 {
+    font-size: 1rem;
+    color: #d4b87a;
+    margin: 1rem 0 0.4rem 0;
+    font-weight: 600;
+}
+
+.summary-content ol,
+.summary-content ul {
+    margin: 0.4rem 0;
+    padding-left: 1.5rem;
+}
+
+.summary-content li {
+    margin-bottom: 0.3rem;
+    line-height: 1.7;
+}
+
 .think-overlay {
     position: fixed;
     top: 0; left: 0;

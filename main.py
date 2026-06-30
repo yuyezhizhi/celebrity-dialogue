@@ -74,6 +74,15 @@ async def dialogue_ws(websocket: WebSocket):
             except Exception:
                 pass
 
+        async def on_summary(summary: str):
+            try:
+                await websocket.send_json({
+                    "type": "summary",
+                    "data": {"content": summary},
+                })
+            except Exception:
+                pass
+
         try:
             messages = await run_dialogue(
                 philosophers=config.philosophers,
@@ -81,6 +90,7 @@ async def dialogue_ws(websocket: WebSocket):
                 max_rounds=config.max_rounds,
                 on_message=on_message,
                 on_typing=on_typing,
+                on_summary=on_summary,
             )
 
             await websocket.send_json({

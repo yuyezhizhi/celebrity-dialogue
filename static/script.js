@@ -175,6 +175,8 @@ function startDialogue() {
             showToast(`讨论结束，共 ${msg.data.total_rounds} 轮 ${msg.data.total_messages} 条发言`);
             dialogueMessages = [];
             saveDialogue();
+        } else if (msg.type === 'summary') {
+            renderSummary(msg.data.content);
         } else if (msg.type === 'error') {
             hideTyping();
             setRunning(false);
@@ -653,6 +655,99 @@ function appendMessage(msg) {
 
     container.appendChild(card);
     card.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+
+function renderSummary(content) {
+    const container = document.getElementById('dialogue-messages');
+    const formatted = mdToHtml(content);
+
+    const card = document.createElement('div');
+    card.className = 'summary-card';
+    card.innerHTML = `
+        <div class="summary-header">
+            <div class="summary-icon">&#x1f4cb;</div>
+            <span class="summary-title">讨论总结</span>
+        </div>
+        <div class="summary-content">${formatted}</div>
+    `;
+
+    container.appendChild(card);
+    card.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+
+function mdToHtml(md) {
+    let html = md
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+    // bold
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+    // headings
+    html = html.replace(/^### (.+)$/gm, '<h4>$1</h4>');
+    html = html.replace(/^## (.+)$/gm, '<h3>$1</h3>');
+
+    const lines = html.split('\n');
+    const result = [];
+    let inList = '';
+    let i = 0;
+
+    while (i < lines.length) {
+        const line = lines[i];
+
+        // empty line: close any open list
+        if (line.trim() === '') {
+            if (inList) { result.push('</' + inList + '>'); inList = ''; }
+            if (result.length > 0 && !result[result.length - 1].endsWith('</p>') && !result[result.length - 1].startsWith('<h')) {
+                result.push('<br>');
+            }
+            i++;
+            continue;
+        }
+
+        // numbered list
+        const numMatch = line.match(/^(\d+)\.\s+(.+)/);
+        if (numMatch) {
+            if (inList !== 'ol') {
+                if (inList) result.push('</' + inList + '>');
+                result.push('<ol>');
+                inList = 'ol';
+            }
+            result.push('<li>' + numMatch[2] + '</li>');
+            i++;
+            continue;
+        }
+
+        // unordered list
+        const ulMatch = line.match(/^[-*]\s+(.+)/);
+        if (ulMatch) {
+            if (inList !== 'ul') {
+                if (inList) result.push('</' + inList + '>');
+                result.push('<ul>');
+                inList = 'ul';
+            }
+            result.push('<li>' + ulMatch[1] + '</li>');
+            i++;
+            continue;
+        }
+
+        // headings handled inline above
+
+        if (inList) { result.push('</' + inList + '>'); inList = ''; }
+
+        // paragraph
+        if (line.startsWith('<h')) {
+            result.push(line);
+        } else {
+            result.push('<p>' + line + '</p>');
+        }
+        i++;
+    }
+
+    if (inList) result.push('</' + inList + '>');
+
+    return result.join('');
 }
 
 function stopDialogue() {

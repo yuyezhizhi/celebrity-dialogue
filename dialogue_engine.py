@@ -320,12 +320,56 @@ async def simulate_response(
     return philosopher_responses[idx]
 
 
+async def generate_summary(
+    topic: str,
+    messages: list[DialogueMessage],
+    api_config: PhilosopherProfile | None = None,
+) -> str:
+    conversation_text = "\n\n".join(
+        f"### {m.philosopher_name}（第{m.round_number}轮）\n{m.content}"
+        for m in messages
+    )
+
+    system_prompt = "你是一位专业的中立讨论归纳者，善于从多元观点的碰撞中提炼核心洞见。"
+
+    prompt = (
+        f"以下是一场关于「{topic}」的多位名人讨论记录，共 {len(messages)} 条发言，"
+        f"参与的名人有 {len(set(m.philosopher_name for m in messages))} 位。\n\n"
+        f"{conversation_text}\n\n"
+        "请你作为讨论的归纳者，用中文撰写一份有意义的整理总结，包含以下部分：\n\n"
+        "1. **核心观点分歧**：各位名人围绕主题的主要立场和分歧点，按学派/领域归类\n"
+        "2. **共识与共鸣**：讨论中浮现的共同认知或相互认同的观点\n"
+        "3. **关键洞见**：最精彩、最深刻的 3-5 句话（标注发言者）\n"
+        "4. **最终思考**：从这场思想交锋中我们可以获得什么启发，对主题有什么更深的理解\n\n"
+        "要求：客观公允、条理清晰，800-1200 字。"
+    )
+
+    profile = api_config or PhilosopherProfile(
+        id="summarizer",
+        name="讨论归纳者",
+        era="",
+        school="",
+        avatar="",
+        thinking_time=0,
+    )
+
+    try:
+        content, _ = await call_ai_model(profile, [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": prompt},
+        ])
+        return content
+    except Exception:
+        return ""
+
+
 async def run_dialogue(
     philosophers: list[PhilosopherProfile],
     topic: str,
     max_rounds: int = 10,
     on_message: Callable[[DialogueMessage], Awaitable[None]] | None = None,
     on_typing: Callable[[dict], Awaitable[None]] | None = None,
+    on_summary: Callable[[str], Awaitable[None]] | None = None,
 ) -> list[DialogueMessage]:
     messages: list[DialogueMessage] = []
 
@@ -379,6 +423,13 @@ async def run_dialogue(
 
             concluded, reason = detect_conclusion(messages, round_num, max_rounds)
             if concluded:
+                if on_summary:
+                    summary = await generate_summary(topic, messages, philosophers[0])
+                    await on_summary(summary)
                 return messages
+
+    if on_summary:
+        summary = await generate_summary(topic, messages, philosophers[0])
+        await on_summary(summary)
 
     return messages
