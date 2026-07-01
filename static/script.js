@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadPhilosophers();
     bindEvents();
     restoreDialogue();
+    restoreApiConfig();
 });
 
 async function loadPhilosophers() {
@@ -129,6 +130,9 @@ function startDialogue() {
     const activePhilosophers = selectedPhilosophers.map(id =>
         philosophers.find(p => p.id === id)
     ).filter(Boolean);
+
+    // 应用全局 API 配置
+    applyGlobalApiConfig(activePhilosophers);
 
     clearPreviousDialogue();
 
@@ -748,6 +752,38 @@ function mdToHtml(md) {
     if (inList) result.push('</' + inList + '>');
 
     return result.join('');
+}
+
+function applyGlobalApiConfig(philosophers) {
+    const apiKey = document.getElementById('global-apikey').value.trim();
+    const baseUrl = document.getElementById('global-baseurl').value.trim();
+    const model = document.getElementById('global-model').value.trim();
+    const provider = document.getElementById('global-provider').value.trim();
+
+    if (apiKey || baseUrl || model || provider) {
+        for (const p of philosophers) {
+            if (apiKey) p.api_key = apiKey;
+            if (baseUrl) p.base_url = baseUrl;
+            if (model) p.model = model;
+            if (provider) p.provider = provider;
+        }
+    }
+
+    // 保存到 sessionStorage
+    const config = { apiKey, baseUrl, model, provider };
+    sessionStorage.setItem('api-config', JSON.stringify(config));
+}
+
+function restoreApiConfig() {
+    try {
+        const saved = JSON.parse(sessionStorage.getItem('api-config'));
+        if (saved) {
+            document.getElementById('global-apikey').value = saved.apiKey || '';
+            document.getElementById('global-baseurl').value = saved.baseUrl || '';
+            document.getElementById('global-model').value = saved.model || '';
+            document.getElementById('global-provider').value = saved.provider || '';
+        }
+    } catch (e) {}
 }
 
 function stopDialogue() {

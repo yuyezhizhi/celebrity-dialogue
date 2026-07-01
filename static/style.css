@@ -121,6 +121,31 @@ header .subtitle {
     min-height: 60px;
 }
 
+.api-config-toggle {
+    margin-bottom: 14px;
+    border: 1px solid rgba(139, 92, 56, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.api-config-toggle summary {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #c9a96e;
+    background: rgba(20, 20, 40, 0.5);
+    user-select: none;
+}
+
+.api-config-toggle[open] summary {
+    border-bottom: 1px solid rgba(139, 92, 56, 0.15);
+}
+
+.api-config-body {
+    padding: 12px 14px;
+    background: rgba(15, 15, 30, 0.5);
+}
+
 .philosopher-selector {
     margin-bottom: 12px;
 }

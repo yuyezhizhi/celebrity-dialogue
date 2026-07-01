@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI 名人对话系统</title>
-    <link rel="stylesheet" href="/static/style.css?v=12">
-    <script src="/static/script.js?v=12"></script>
+    <link rel="stylesheet" href="/static/style.css?v=13">
+    <script src="/static/script.js?v=13"></script>
 </head>
 <body>
     <div class="app-container">
@@ -24,6 +24,31 @@
                 <label>讨论主题</label>
                 <input type="text" id="topic" placeholder="例如：人生的意义是什么？自由意志是否存在？幸福是什么？" value="人生的意义是什么？">
             </div>
+
+            <details class="api-config-toggle" id="api-config-toggle">
+                <summary>API 配置（全局，应用到所有名人）</summary>
+                <div class="api-config-body">
+                    <div class="form-group">
+                        <label>API Key</label>
+                        <input type="password" id="global-apikey" placeholder="sk-... 或留空使用模拟">
+                    </div>
+                    <div class="form-group">
+                        <label>API Base URL</label>
+                        <input type="text" id="global-baseurl" placeholder="https://api.openai.com/v1">
+                    </div>
+                    <div class="form-group">
+                        <label>模型名称</label>
+                        <input type="text" id="global-model" placeholder="gpt-3.5-turbo">
+                    </div>
+                    <div class="form-group">
+                        <label>协议类型</label>
+                        <select id="global-provider">
+                            <option value="">OpenAI 兼容</option>
+                            <option value="anthropic">Anthropic</option>
+                        </select>
+                    </div>
+                </div>
+            </details>
 
             <div class="philosopher-selector">
                 <label>选择参与讨论的名人（至少两位，点击头像可分别配置模型）</label>
