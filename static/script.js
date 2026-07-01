@@ -700,12 +700,7 @@ function mdToHtml(md) {
     while (i < lines.length) {
         const line = lines[i];
 
-        // empty line: close any open list
         if (line.trim() === '') {
-            if (inList) { result.push('</' + inList + '>'); inList = ''; }
-            if (result.length > 0 && !result[result.length - 1].endsWith('</p>') && !result[result.length - 1].startsWith('<h')) {
-                result.push('<br>');
-            }
             i++;
             continue;
         }
